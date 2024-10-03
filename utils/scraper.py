@@ -3,6 +3,7 @@
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 from utils.logger import setup_logger
+import re
 import time
 
 # Configuração do logger
@@ -82,7 +83,8 @@ def realizar_scraping(streamer_name):
 
         # Aguardar até que os VODs estejam presentes
         try:
-            page.wait_for_selector("div.vod-item", timeout=10000)
+            # Procurar por qualquer link que contenha '.m3u8'
+            page.wait_for_selector("a[href*='.m3u8']", timeout=10000)
             logger.debug("Elementos de VOD encontrados na página do canal.")
         except:
             logger.warning("Tempo limite atingido ao aguardar os elementos de VOD na página do canal.")
@@ -98,21 +100,27 @@ def realizar_scraping(streamer_name):
     try:
         channel_soup = BeautifulSoup(channel_page_html, 'html.parser')
         vods = []
-        for vod in channel_soup.find_all('div', class_='vod-item'):
-            title_tag = vod.find('h3')
-            link_tag = vod.find('a', href=True)
-            thumbnail_tag = vod.find('img', src=True)
-            if not title_tag or not link_tag:
-                logger.debug("VOD sem título ou link encontrado. Ignorando.")
-                continue
-            title = title_tag.get_text(strip=True)
-            link = f"https://vodvod.top{link_tag['href']}"
-            thumbnail = thumbnail_tag['src'] if thumbnail_tag else None
-            vods.append({
-                'title': title,
-                'link': link,
-                'thumbnail': thumbnail
-            })
+
+        # Encontrar todos os links que correspondem ao padrão .m3u8
+        m3u8_links = channel_soup.find_all('a', href=True)
+        pattern = re.compile(r'https://api\.vodvod\.top/m3u8/\d+/\d+/index\.m3u8')
+
+        for link in m3u8_links:
+            href = link['href']
+            match = pattern.match(href)
+            if match:
+                vod_link = match.group()
+                # Tentar extrair o título do VOD
+                title = link.get_text(strip=True) or "Sem Título"
+                vods.append({
+                    'title': title,
+                    'link': vod_link,
+                    'thumbnail': None  # Atualize se as miniaturas puderem ser extraídas
+                })
+
+        # Remover duplicatas
+        vods = [dict(t) for t in {tuple(d.items()) for d in vods}]
+
         logger.info(f"Encontrados {len(vods)} VODs na página do canal.")
         return vods
     except Exception as e:

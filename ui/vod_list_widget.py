@@ -17,7 +17,7 @@ class VODListWidget(QListWidget):
     def populate_vods(self, vods):
         """
         Popula a lista de VODs.
-        
+
         :param vods: Lista de dicionários contendo 'title', 'link' e 'thumbnail'
         """
         logger.debug("Populando a lista de VODs.")
@@ -32,5 +32,8 @@ class VODListWidget(QListWidget):
                     item.setIcon(QIcon(vod['thumbnail']))
                 except Exception as e:
                     logger.warning(f"Falha ao definir o ícone para o VOD '{vod['title']}': {e}")
+            else:
+                # Opcional: Definir um ícone padrão se não houver miniatura
+                item.setIcon(QIcon("resources/icons/default_thumbnail.png"))
             self.addItem(item)
         logger.info(f"{len(vods)} VODs adicionados à lista.")
