@@ -1,0 +1,46 @@
+# Ignorar arquivos de configuração com credenciais
+data/history.json
+data/favorites.json
+new_features
+importcodetotxt.py 
+output.txt
+test.py 
+test.env
+pythonDOC
+
+# Ignorar logs
+data/logs/
+data/cache
+
+# Ignorar caches e arquivos compilados
+__pycache__/
+*.py[cod]
+
+# Ignorar ambientes virtuais
+venv/
+env/
+
+# Ignorar arquivos temporários do sistema
+*.tmp
+*.log
+*.bak
+*.swp
+.DS_Store
+Thumbs.db
+
+# Ignorar configurações de IDE
+.idea/
+.vscode/
+
+# Ignorar arquivos de banco de dados (se houver)
+*.sqlite3
+*.db
+
+# Ignorar arquivos de histórico (opcional)
+data/history/
+
+# Ignorar qualquer outro arquivo sensível ou não necessário
+*.p12
+*.pem
+*.crt
+*.key
