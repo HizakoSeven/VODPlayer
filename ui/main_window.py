@@ -1,6 +1,6 @@
 # ui/main_window.py
 
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLineEdit, QPushButton, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLineEdit, QPushButton, QMessageBox, QHBoxLayout, QLabel
 from PyQt5 import QtCore
 from .video_player_widget import VideoPlayerWidget
 from .vod_list_widget import VODListWidget
@@ -18,7 +18,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         logger.info("Inicializando a MainWindow.")
         self.setWindowTitle("VODPlayer")
-        self.setGeometry(100, 100, 800, 600)  # Define o tamanho da janela
+        self.setGeometry(100, 100, 1200, 800)  # Aumentar o tamanho para melhor visualização
 
         # Widgets
         self.search_field = QLineEdit()
@@ -28,14 +28,25 @@ class MainWindow(QMainWindow):
         self.video_player = VideoPlayerWidget()
 
         # Layouts
-        layout = QVBoxLayout()
-        layout.addWidget(self.search_field)
-        layout.addWidget(self.search_button)
-        layout.addWidget(self.vod_list)
-        layout.addWidget(self.video_player)
+        main_layout = QHBoxLayout()
+
+        # Área de busca e lista de VODs
+        left_layout = QVBoxLayout()
+        left_layout.addWidget(self.search_field)
+        left_layout.addWidget(self.search_button)
+        left_layout.addWidget(QLabel("Lista de VODs:"))
+        left_layout.addWidget(self.vod_list)
+
+        # Área de player de vídeo
+        right_layout = QVBoxLayout()
+        right_layout.addWidget(QLabel("Player de Vídeo:"))
+        right_layout.addWidget(self.video_player)
+
+        main_layout.addLayout(left_layout, 30)  # 30% da largura
+        main_layout.addLayout(right_layout, 70)  # 70% da largura
 
         container = QWidget()
-        container.setLayout(layout)
+        container.setLayout(main_layout)
         self.setCentralWidget(container)
 
         # Signals
