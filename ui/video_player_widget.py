@@ -6,9 +6,10 @@ import vlc
 from utils.logger import setup_logger
 import sys
 import os
+import asyncio
 
 # Configuração do logger
-logger = setup_logger('VideoPlayerWidget')
+logger = setup_logger("VideoPlayerWidget")
 
 
 class VideoPlayerWidget(QWidget):
@@ -20,14 +21,16 @@ class VideoPlayerWidget(QWidget):
 
         # Integrar o player com o widget
         try:
-            if sys.platform.startswith('linux'):  # para Linux usando X Server
+            if sys.platform.startswith("linux"):  # para Linux usando X Server
                 self.player.set_xwindow(self.winId())
             elif sys.platform == "win32":  # para Windows
                 self.player.set_hwnd(self.winId())
             elif sys.platform == "darwin":  # para MacOS
                 self.player.set_nsobject(int(self.winId()))
             else:
-                logger.error("Sistema operacional não suportado para integração com VLC.")
+                logger.error(
+                    "Sistema operacional não suportado para integração com VLC."
+                )
         except Exception as e:
             logger.exception(f"Erro ao configurar o video output: {e}")
 
@@ -36,16 +39,15 @@ class VideoPlayerWidget(QWidget):
         # Adicionar event manager para capturar eventos de VLC
         self.events = self.player.event_manager()
         self.events.event_attach(
-            vlc.EventType.MediaPlayerEncounteredError,
-            self.handle_error
+            vlc.EventType.MediaPlayerEncounteredError, self.handle_error
         )
-        self.events.event_attach(
-            vlc.EventType.MediaPlayerEndReached,
-            self.handle_end
-        )
+        self.events.event_attach(vlc.EventType.MediaPlayerEndReached, self.handle_end)
 
     def play(self, media_path):
         logger.info(f"Reproduzindo mídia: {media_path}")
+        asyncio.create_task(self.async_play(media_path))
+
+    async def async_play(self, media_path):
         try:
             if not os.path.exists(media_path):
                 logger.error(f"O arquivo de mídia não existe: {media_path}")
@@ -57,15 +59,17 @@ class VideoPlayerWidget(QWidget):
             logger.debug("Mídia iniciada com sucesso.")
 
             # Verificar se o player está realmente reproduzindo
+            await asyncio.sleep(1)  # Aguarda um tempo para iniciar a reprodução
             state = self.player.get_state()
             logger.debug(f"Estado inicial do player após play(): {state}")
 
             # Adicionar verificação periódica do estado do player
-            QtCore.QTimer.singleShot(5000, self.check_player_state)
+            asyncio.create_task(self.check_player_state())
         except Exception as e:
             logger.exception(f"Erro ao reproduzir mídia '{media_path}': {e}")
 
-    def check_player_state(self):
+    async def check_player_state(self):
+        await asyncio.sleep(5)  # Espera alguns segundos antes de verificar o estado
         state = self.player.get_state()
         logger.debug(f"Estado do player após 5 segundos: {state}")
         if state == vlc.State.Error:

@@ -1,10 +1,13 @@
 # tests/test_main.py
 
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from main import main
 
-@patch('PyQt5.QtWidgets.QApplication.exec_')
+
+@patch("PyQt5.QtWidgets.QApplication.exec_")
 def test_main_initialization(mock_exec):
     """
     Testa se a aplicação inicializa sem erros, mockando exec_.
