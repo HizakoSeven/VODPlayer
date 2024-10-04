@@ -1,0 +1,48 @@
+name: CI for VODPlayer
+
+on:
+  push:
+    branches: [ main ] 
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, 3.10, 3.11]  # Testar em múltiplas versões do Python
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Atualizar pip
+        run: python -m pip install --upgrade pip
+
+      - name: Instalar dependências
+        run: |
+          pip install -r requirements.txt
+          # Instalar dependências do Playwright
+          playwright install
+
+      - name: Executar testes
+        run: |
+          pytest
+
+      - name: Verificar formatação com Black
+        run: |
+          pip install black
+          black --check .
+
+      - name: Verificar tipos com mypy
+        run: |
+          pip install mypy
+          mypy .
+
