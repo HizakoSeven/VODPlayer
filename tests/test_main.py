@@ -1,11 +1,5 @@
-import sys
-import os
 import pytest
-
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from main import main  # Agora deve conseguir importar corretamente
+from main import main  # Ajuste conforme a estrutura do seu projeto
 
 def test_main_initialization():
     """

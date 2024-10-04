@@ -31,7 +31,7 @@ jobs:
 
       - name: Run tests
         env:
-          PYTHONPATH: ${{ github.workspace }}
+          PYTHONPATH: ${{ github.workspace }}  # Adiciona o diretório raiz ao PYTHONPATH
         run: |
           pytest tests/ --maxfail=1 --disable-warnings -v
 
