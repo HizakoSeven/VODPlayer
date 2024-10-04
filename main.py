@@ -1,28 +1,27 @@
 # main.py
 
-import sys
 import atexit
-from PyQt5.QtWidgets import QApplication
-from ui.main_window import MainWindow
-from utils.logger import setup_logger
-from logging.handlers import RotatingFileHandler
 import logging
 import os
+import sys
+from logging.handlers import RotatingFileHandler
 
+from PyQt5.QtWidgets import QApplication
+
+from ui.main_window import MainWindow
+from utils.logger import setup_logger
 
 # Configuração do logger com nível de log obtido da variável de ambiente
 log_level = os.getenv(
-    'LOG_LEVEL', 'DEBUG'
+    "LOG_LEVEL", "DEBUG"
 ).upper()  # Obtém o nível de log da variável de ambiente, padrão para 'DEBUG'
 
-logger = setup_logger('MainApp')  # Cria um logger para a aplicação principal
+logger = setup_logger("MainApp")  # Cria um logger para a aplicação principal
 
 
 # Adicionar um handler de arquivo para persistir logs
 file_handler = RotatingFileHandler(
-    'logs/main_app.log',
-    maxBytes=10 * 1024 * 1024,
-    backupCount=3
+    "logs/main_app.log", maxBytes=10 * 1024 * 1024, backupCount=3
 )  # Configura um handler de arquivo com rotação para limitar o tamanho do log
 
 file_handler.setLevel(
@@ -30,7 +29,7 @@ file_handler.setLevel(
 )  # Define o nível do handler baseado na configuração
 
 formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )  # Formato do log com timestamp, nome do logger, nível e mensagem
 
 file_handler.setFormatter(formatter)  # Define o formato do log para o handler
@@ -81,7 +80,9 @@ def main():
         # Executa a aplicação e aguarda até que seja fechada
         return_code = app.exec_()  # Executa o loop principal do Qt
         logger.info(f"Aplicação encerrada com código de retorno: {return_code}")
-        print(f"Aplicação encerrada com código de retorno: {return_code}")  # Debug print
+        print(
+            f"Aplicação encerrada com código de retorno: {return_code}"
+        )  # Debug print
         sys.exit(return_code)  # Sai do programa com o código de retorno da aplicação
     except SystemExit:
         # Se houver uma chamada explícita para sys.exit(), apenas re-levanta a exceção
@@ -95,7 +96,7 @@ def main():
         sys.exit(1)  # Sai do programa com código de erro
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Ponto de entrada do script
     logger.debug("Ponto de entrada do script.")
     print("Ponto de entrada do script.")  # Debug print

@@ -1,4 +1,4 @@
-# ui/main_window.py
+# ui/main_window.py (versão atualizada para asyncio)
 
 from PyQt5.QtWidgets import (
     QMainWindow,
@@ -13,13 +13,14 @@ from PyQt5.QtWidgets import (
 from PyQt5 import QtCore
 from .video_player_widget import VideoPlayerWidget
 from .vod_list_widget import VODListWidget
-from utils.scraper import scrape_vods
+from utils.scraper import scrape_vods_async
 from utils.downloader import download_m3u8
 from utils.logger import setup_logger
 import os
+import asyncio
 
 # Configuração do logger
-logger = setup_logger('MainWindow')
+logger = setup_logger("MainWindow")
 
 
 class MainWindow(QMainWindow):
@@ -27,7 +28,9 @@ class MainWindow(QMainWindow):
         super().__init__()
         logger.info("Inicializando a MainWindow.")
         self.setWindowTitle("VODPlayer")
-        self.setGeometry(100, 100, 1200, 800)  # Aumentar o tamanho para melhor visualização
+        self.setGeometry(
+            100, 100, 1200, 800
+        )  # Aumentar o tamanho para melhor visualização
 
         # Widgets
         self.search_field = QLineEdit()
@@ -59,11 +62,11 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
 
         # Signals
-        self.search_button.clicked.connect(self.search_vods)
-        self.vod_list.itemClicked.connect(self.play_vod)
+        self.search_button.clicked.connect(self.handle_search)
+        self.vod_list.itemClicked.connect(self.handle_vod_selection)
         logger.info("MainWindow inicializada com sucesso.")
 
-    def search_vods(self):
+    def handle_search(self):
         streamer_name = self.search_field.text().strip()
         logger.debug(f"Usuário iniciou a busca pelo streamer: '{streamer_name}'")
         if not streamer_name:
@@ -75,10 +78,15 @@ class MainWindow(QMainWindow):
             )
             return
 
+        # Executa o scraping de forma assíncrona
+        asyncio.create_task(self.perform_scrape(streamer_name))
+
+    async def perform_scrape(self, streamer_name):
         try:
-            # Chamar função de scraping para obter os VODs
-            vods = scrape_vods(streamer_name)
-            logger.info(f"Encontrados {len(vods)} VODs para o streamer '{streamer_name}'.")
+            vods = await scrape_vods_async(streamer_name)
+            logger.info(
+                f"Encontrados {len(vods)} VODs para o streamer '{streamer_name}'."
+            )
             if vods:
                 self.vod_list.populate_vods(vods)
             else:
@@ -96,22 +104,25 @@ class MainWindow(QMainWindow):
                 "Ocorreu um erro ao buscar os VODs. Verifique os logs para mais detalhes.",
             )
 
-    def play_vod(self, item):
+    def handle_vod_selection(self, item):
         vod_url = item.data(QtCore.Qt.UserRole)
         logger.debug(f"Usuário selecionou o VOD com URL: {vod_url}")
         if vod_url:
-            try:
-                # Chamar função de download e reproduzir o VOD
-                cache_dir = os.path.join(os.getcwd(), 'data', 'cache', 'm3u8_files')
-                os.makedirs(cache_dir, exist_ok=True)
-                m3u8_path = download_m3u8(vod_url, cache_dir)
-                logger.info(f"Arquivo .m3u8 baixado em: {m3u8_path}")
-                self.video_player.play(m3u8_path)
-                logger.info(f"Reprodução iniciada para o VOD: {m3u8_path}")
-            except Exception:
-                logger.exception(f"Erro ao reproduzir o VOD com URL: {vod_url}")
-                QMessageBox.critical(
-                    self,
-                    "Erro",
-                    "Ocorreu um erro ao reproduzir o VOD. Verifique os logs para mais detalhes.",
-                )
+            # Executa o download do VOD de forma assíncrona
+            asyncio.create_task(self.download_and_play_vod(vod_url))
+
+    async def download_and_play_vod(self, vod_url):
+        try:
+            cache_dir = os.path.join(os.getcwd(), "data", "cache", "m3u8_files")
+            os.makedirs(cache_dir, exist_ok=True)
+            m3u8_path = await download_m3u8(vod_url, cache_dir)
+            logger.info(f"Arquivo .m3u8 baixado em: {m3u8_path}")
+            self.video_player.play(m3u8_path)
+            logger.info(f"Reprodução iniciada para o VOD: {m3u8_path}")
+        except Exception:
+            logger.exception(f"Erro ao reproduzir o VOD com URL: {vod_url}")
+            QMessageBox.critical(
+                self,
+                "Erro",
+                "Ocorreu um erro ao reproduzir o VOD. Verifique os logs para mais detalhes.",
+            )
