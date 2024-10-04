@@ -13,7 +13,6 @@ from PyQt5.QtWidgets import (
 from PyQt5 import QtCore
 from .video_player_widget import VideoPlayerWidget
 from .vod_list_widget import VODListWidget
-from utils.scraper import scrape_vods_async
 from utils.downloader import download_m3u8
 from utils.logger import setup_logger
 import os
@@ -24,8 +23,9 @@ logger = setup_logger("MainWindow")
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, scraper, parent=None):
+        super().__init__(parent)
+        self.scraper = scraper  # Armazenar a instância do scraper
         logger.info("Inicializando a MainWindow.")
         self.setWindowTitle("VODPlayer")
         self.setGeometry(
@@ -83,7 +83,9 @@ class MainWindow(QMainWindow):
 
     async def perform_scrape(self, streamer_name):
         try:
-            vods = await scrape_vods_async(streamer_name)
+            vods = await self.scraper.scrape_vods_async(
+                streamer_name
+            )  # Usar o scraper passado
             logger.info(
                 f"Encontrados {len(vods)} VODs para o streamer '{streamer_name}'."
             )

@@ -10,13 +10,13 @@ from PyQt5.QtWidgets import QApplication
 
 from ui.main_window import MainWindow
 from utils.logger import setup_logger
+from utils.scraper import Scraper  # Importar a classe Scraper
 
 import qasync
 import asyncio
 
 # Reconfigura o stdout para usar 'utf-8'
 sys.stdout.reconfigure(encoding="utf-8")
-
 
 # Configuração do logger com nível de log obtido da variável de ambiente
 log_level = os.getenv("LOG_LEVEL", "DEBUG").upper()
@@ -32,6 +32,9 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
+# Inicializar o Scraper
+scraper = Scraper()
+
 
 def cleanup():
     """
@@ -39,6 +42,7 @@ def cleanup():
     """
     logger.info("Encerrando a aplicação.")
     print("Encerrando a aplicação.")
+    asyncio.run(scraper.close())  # Fechar o scraper
     # Adicionar operações de limpeza adicionais, se necessário
 
 
@@ -57,8 +61,11 @@ async def main_async():
     logger.debug("QApplication inicializada com sucesso.")
     print("QApplication inicializada com sucesso.")
 
+    # Inicializar o Scraper
+    await scraper.initialize()
+
     # Cria a janela principal da aplicação
-    window = MainWindow()
+    window = MainWindow(scraper)  # Passar o scraper para a janela
     logger.debug("Janela principal criada com sucesso.")
     print("Janela principal criada com sucesso.")
     window.show()
