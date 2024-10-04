@@ -2,4 +2,5 @@
 
 ignore = [
 	"E501", # Line too long
+    "F401", # Imported but unused       
 ]

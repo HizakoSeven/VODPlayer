@@ -1,4 +1,4 @@
-# ui/vod_list_widget.py (versão atualizada para asyncio)
+# ui/vod_list_widget.py
 
 from PyQt5.QtWidgets import QListWidget, QListWidgetItem
 from PyQt5.QtGui import QIcon

@@ -1,4 +1,4 @@
-# utils/scraper.py (versão atualizada para asyncio)
+# utils/scraper.py
 
 import asyncio
 import logging

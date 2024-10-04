@@ -1,9 +1,10 @@
-# utils/logger.py (versão atualizada para asyncio)
+# utils/logger.py
 
 import logging
 import os
 from logging.handlers import RotatingFileHandler
 import asyncio
+import qasync
 
 
 def setup_logger(name=__name__, log_file="logs/app.log", level=logging.DEBUG):

@@ -19,3 +19,4 @@ jobs:
         run: pip install ruff==0.3.3
       - name: Run Ruff
         run: ruff .
+          

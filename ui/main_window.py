@@ -1,4 +1,4 @@
-# ui/main_window.py (versão atualizada para asyncio)
+# ui/main_window.py
 
 from PyQt5.QtWidgets import (
     QMainWindow,

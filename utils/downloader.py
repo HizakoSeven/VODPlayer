@@ -1,4 +1,4 @@
-# utils/downloader.py (versão atualizada para asyncio)
+# utils/downloader.py
 
 import asyncio
 import os

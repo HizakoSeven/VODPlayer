@@ -1,4 +1,4 @@
-# ui/video_player_widget.py (versão atualizada para asyncio)
+# ui/video_player_widget.py
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtCore
