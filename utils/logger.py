@@ -3,8 +3,9 @@
 import logging
 import os
 from logging.handlers import RotatingFileHandler
-import asyncio
+import sys
 import qasync
+import asyncio
 
 
 def setup_logger(name=__name__, log_file="logs/app.log", level=logging.DEBUG):
@@ -28,17 +29,21 @@ def setup_logger(name=__name__, log_file="logs/app.log", level=logging.DEBUG):
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )
 
-        # Handler para o arquivo de log com rotação
+        # Handler para o arquivo de log com rotação e codificação UTF-8
         file_handler = RotatingFileHandler(
-            log_file, maxBytes=5 * 1024 * 1024, backupCount=5
+            log_file,
+            maxBytes=5 * 1024 * 1024,  # 5 MB
+            backupCount=5,
+            encoding="utf-8",  # Especifica a codificação UTF-8
         )
         file_handler.setFormatter(formatter)
         file_handler.setLevel(level)
 
-        # Handler para a saída no console
-        console_handler = logging.StreamHandler()
+        # Handler para a saída no console com codificação UTF-8
+        console_handler = logging.StreamHandler(stream=sys.stdout)
         console_handler.setFormatter(formatter)
         console_handler.setLevel(logging.INFO)
+        console_handler.encoding = "utf-8"  # Define a codificação para UTF-8
 
         logger.addHandler(file_handler)
         logger.addHandler(console_handler)

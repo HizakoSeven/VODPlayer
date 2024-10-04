@@ -1,5 +1,6 @@
 # main.py
 
+import sys
 import atexit
 import logging
 import os
@@ -14,6 +15,10 @@ from utils.logger import setup_logger
 import qasync
 import asyncio
 
+# Reconfigura o stdout para usar 'utf-8'
+sys.stdout.reconfigure(encoding="utf-8")
+
+
 # Configuração do logger com nível de log obtido da variável de ambiente
 log_level = os.getenv("LOG_LEVEL", "DEBUG").upper()
 
@@ -24,11 +29,10 @@ file_handler = RotatingFileHandler(
     "logs/main_app.log", maxBytes=10 * 1024 * 1024, backupCount=3
 )
 file_handler.setLevel(getattr(logging, log_level, logging.DEBUG))
-formatter = logging.Formatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
+
 
 def cleanup():
     """
@@ -37,6 +41,7 @@ def cleanup():
     logger.info("Encerrando a aplicação.")
     print("Encerrando a aplicação.")
     # Adicionar operações de limpeza adicionais, se necessário
+
 
 async def main_async():
     """
@@ -77,6 +82,7 @@ async def main_async():
     # Aguarda até que a aplicação seja encerrada
     await app_exit_event.wait()
 
+
 def main():
     """
     Função principal síncrona que inicia a aplicação.
@@ -85,6 +91,7 @@ def main():
     logger.debug("Ponto de entrada do script.")
     print("Ponto de entrada do script.")
     qasync.run(main_async())
+
 
 if __name__ == "__main__":
     main()
