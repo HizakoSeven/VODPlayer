@@ -1,3 +1,5 @@
+# tests/test_main.py
+
 import pytest
 from main import main  # Ajuste conforme a estrutura do seu projeto
 
