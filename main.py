@@ -1,7 +1,6 @@
 # main.py
 
 import sys
-import atexit
 import logging
 import os
 from logging.handlers import RotatingFileHandler
@@ -36,16 +35,6 @@ logger.addHandler(file_handler)
 scraper = Scraper()
 
 
-def cleanup():
-    """
-    Função de limpeza chamada ao encerrar a aplicação.
-    """
-    logger.info("Encerrando a aplicação.")
-    print("Encerrando a aplicação.")
-    asyncio.run(scraper.close())  # Fechar o scraper
-    # Adicionar operações de limpeza adicionais, se necessário
-
-
 async def main_async():
     """
     Função principal assíncrona que inicializa a aplicação VODPlayer.
@@ -72,21 +61,24 @@ async def main_async():
     logger.debug("Janela principal exibida.")
     print("Janela principal exibida.")
 
-    # Registra a função de limpeza para ser chamada ao encerrar a aplicação
-    atexit.register(cleanup)
-    logger.debug("Função de limpeza registrada com sucesso.")
-    print("Função de limpeza registrada com sucesso.")
-
     # Cria um evento para aguardar até que a aplicação seja encerrada
     app_exit_event = asyncio.Event()
 
     def on_exit():
+        logger.debug("Sinal de encerramento recebido. Iniciando processo de limpeza.")
         app_exit_event.set()
 
     app.aboutToQuit.connect(on_exit)
 
     # Aguarda até que a aplicação seja encerrada
     await app_exit_event.wait()
+
+    # Após o evento ser acionado, realizar a limpeza
+    logger.info("Iniciando limpeza após encerramento da aplicação.")
+    print("Iniciando limpeza após encerramento da aplicação.")
+    await scraper.close()
+    logger.info("Scraper fechado com sucesso.")
+    print("Scraper fechado com sucesso.")
 
 
 def main():

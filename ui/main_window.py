@@ -128,3 +128,16 @@ class MainWindow(QMainWindow):
                 "Erro",
                 "Ocorreu um erro ao reproduzir o VOD. Verifique os logs para mais detalhes.",
             )
+
+    def closeEvent(self, event):
+        """
+        Método sobrescrito para gerenciar o encerramento da aplicação.
+        """
+        logger.info("MainWindow está fechando. Iniciando processo de limpeza.")
+        print("MainWindow está fechando. Iniciando processo de limpeza.")
+
+        # Parar a reprodução do VOD
+        self.video_player.stop()
+
+        # Aceitar o evento para continuar o fechamento
+        event.accept()
