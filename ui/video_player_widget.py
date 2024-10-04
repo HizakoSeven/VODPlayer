@@ -43,9 +43,15 @@ class VideoPlayerWidget(QWidget):
         )
         self.events.event_attach(vlc.EventType.MediaPlayerEndReached, self.handle_end)
 
+        # Inicializar variáveis para gerenciamento de tarefas
+        self.check_state_task = None
+        self._stop_flag = False
+
     def play(self, media_path):
         logger.info(f"Reproduzindo mídia: {media_path}")
-        asyncio.create_task(self.async_play(media_path))
+        # Cancelar qualquer reprodução anterior antes de iniciar uma nova
+        self.stop()
+        self.check_state_task = asyncio.create_task(self.async_play(media_path))
 
     async def async_play(self, media_path):
         try:
@@ -64,22 +70,48 @@ class VideoPlayerWidget(QWidget):
             logger.debug(f"Estado inicial do player após play(): {state}")
 
             # Adicionar verificação periódica do estado do player
-            asyncio.create_task(self.check_player_state())
+            self.check_state_task = asyncio.create_task(self.check_player_state())
         except Exception as e:
             logger.exception(f"Erro ao reproduzir mídia '{media_path}': {e}")
 
     async def check_player_state(self):
-        await asyncio.sleep(5)  # Espera alguns segundos antes de verificar o estado
-        state = self.player.get_state()
-        logger.debug(f"Estado do player após 5 segundos: {state}")
-        if state == vlc.State.Error:
-            logger.error("Erro detectado no player após tentativa de reprodução.")
-        elif state == vlc.State.Ended:
-            logger.info("Reprodução da mídia encerrada.")
-        elif state == vlc.State.Playing:
-            logger.debug("Mídia está sendo reproduzida.")
-        else:
-            logger.warning(f"Estado inesperado do player: {state}")
+        try:
+            while not self._stop_flag:
+                await asyncio.sleep(
+                    5
+                )  # Espera alguns segundos antes de verificar o estado
+                state = self.player.get_state()
+                logger.debug(f"Estado do player após 5 segundos: {state}")
+                if state == vlc.State.Error:
+                    logger.error(
+                        "Erro detectado no player após tentativa de reprodução."
+                    )
+                elif state == vlc.State.Ended:
+                    logger.info("Reprodução da mídia encerrada.")
+                elif state == vlc.State.Playing:
+                    logger.debug("Mídia está sendo reproduzida.")
+                else:
+                    logger.warning(f"Estado inesperado do player: {state}")
+        except asyncio.CancelledError:
+            logger.debug("Tarefa check_player_state cancelada.")
+        except Exception as e:
+            logger.exception(f"Erro na tarefa check_player_state: {e}")
+
+    def stop(self):
+        """
+        Método para parar a reprodução e cancelar tarefas assíncronas relacionadas.
+        """
+        if self.player.is_playing():
+            self.player.stop()
+            logger.info("Playback interrompido.")
+
+        # Sinalizar para a tarefa de verificação de estado que deve parar
+        self._stop_flag = True
+
+        # Cancelar a tarefa de verificação de estado, se existir
+        if self.check_state_task and not self.check_state_task.done():
+            self.check_state_task.cancel()
+            logger.debug("Tarefa check_player_state foi cancelada.")
 
     def handle_error(self, event):
         logger.error("Erro encontrado durante a reprodução da mídia.")
