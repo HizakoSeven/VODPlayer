@@ -3,5 +3,4 @@
 ignore = [
 	"E501", # Line too long
     "F401"
-    "F402"
 ]
