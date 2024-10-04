@@ -1,7 +1,0 @@
-pytest
-flake8
-black
-isort
-autopep8
-pylint
-mypy
