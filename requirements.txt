@@ -3,3 +3,4 @@ python-vlc
 requests
 playwright
 beautifulsoup4
+Pytest
