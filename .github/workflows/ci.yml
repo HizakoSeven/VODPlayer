@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.8, 3.9, 3.10, 3.11]  # Versões suportadas do Python
+        python-version: [3.8, 3.9, 3.10, 3.11]  # Apenas versões suportadas
 
     steps:
       - name: Checkout do código
@@ -28,7 +28,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-ci
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -55,4 +55,4 @@ jobs:
           pip install mypy
           mypy .
 
-      # Opcional: Adicionar etapas para linting, segurança, etc.
+      # Opcional: Adicionar etapas para linting, segurança, eetc.
