@@ -2,9 +2,10 @@ name: CI for VODPlayer
 
 on:
   push:
-    branches: [ main ] 
+    branches: [ main ]  # Substitua 'main' pela sua branch principal, se diferente
   pull_request:
     branches: [ main ]
+  workflow_dispatch:  # Permite execução manual
 
 jobs:
   build:
@@ -22,6 +23,14 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Cache de pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Atualizar pip
         run: python -m pip install --upgrade pip
@@ -46,3 +55,4 @@ jobs:
           pip install mypy
           mypy .
 
+      # Opcional: Adicionar etapas para linting, segurança, etc.

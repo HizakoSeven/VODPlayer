@@ -1,4 +1,5 @@
 PyQt5
-requests
-beautifulsoup4
 python-vlc
+requests
+playwright
+beautifulsoup4
