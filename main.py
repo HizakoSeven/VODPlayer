@@ -4,7 +4,6 @@ import sys
 import atexit
 import logging
 import os
-import sys
 from logging.handlers import RotatingFileHandler
 
 from PyQt5.QtWidgets import QApplication
