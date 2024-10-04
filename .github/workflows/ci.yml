@@ -30,7 +30,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/ --maxfail=1 --disable-warnings -v || exit 1
+          pytest tests/ --maxfail=1 --disable-warnings -v
 
   lint:
     runs-on: ubuntu-22.04
@@ -50,4 +50,4 @@ jobs:
 
       - name: Run lint
         run: |
-          flake8  --exclude=__pycache__,venv . || exit 1
+          flake8 --exclude=__pycache__,venv .
