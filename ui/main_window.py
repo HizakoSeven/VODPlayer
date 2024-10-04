@@ -115,4 +115,3 @@ class MainWindow(QMainWindow):
                     "Erro",
                     "Ocorreu um erro ao reproduzir o VOD. Verifique os logs para mais detalhes.",
                 )
-                
