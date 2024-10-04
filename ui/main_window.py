@@ -88,7 +88,7 @@ class MainWindow(QMainWindow):
                     "Resultados da Busca",
                     "Nenhum VOD encontrado para o streamer informado.",
                 )
-        except Exception as e:
+        except Exception:
             logger.exception(f"Erro ao buscar VODs para o streamer '{streamer_name}'.")
             QMessageBox.critical(
                 self,
@@ -108,10 +108,11 @@ class MainWindow(QMainWindow):
                 logger.info(f"Arquivo .m3u8 baixado em: {m3u8_path}")
                 self.video_player.play(m3u8_path)
                 logger.info(f"Reprodução iniciada para o VOD: {m3u8_path}")
-            except Exception as e:
+            except Exception:
                 logger.exception(f"Erro ao reproduzir o VOD com URL: {vod_url}")
                 QMessageBox.critical(
                     self,
                     "Erro",
                     "Ocorreu um erro ao reproduzir o VOD. Verifique os logs para mais detalhes.",
                 )
+                

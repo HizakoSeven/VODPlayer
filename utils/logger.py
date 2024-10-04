@@ -8,7 +8,6 @@ from logging.handlers import RotatingFileHandler
 def setup_logger(name=__name__, log_file='logs/app.log', level=logging.DEBUG):
     """
     Configura e retorna um logger.
-    
     :param name: Nome do logger.
     :param log_file: Caminho para o arquivo de log.
     :param level: Nível de severidade do logger.

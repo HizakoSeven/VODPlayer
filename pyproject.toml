@@ -1,0 +1,14 @@
+[tool.black]
+line-length = 142
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 142
+
+[flake8]
+exclude =
+    __pycache__,
+    venv,
+    .github
+max-line-length = 142
