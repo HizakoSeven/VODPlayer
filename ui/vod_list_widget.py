@@ -8,6 +8,7 @@ from utils.logger import setup_logger
 # Configuração do logger
 logger = setup_logger('VODListWidget')
 
+
 class VODListWidget(QListWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -31,7 +32,9 @@ class VODListWidget(QListWidget):
                     # Se o thumbnail for uma URL, você pode baixar a imagem ou usar diretamente se suportado
                     item.setIcon(QIcon(vod['thumbnail']))
                 except Exception as e:
-                    logger.warning(f"Falha ao definir o ícone para o VOD '{vod['title']}': {e}")
+                    logger.warning(
+                        f"Falha ao definir o ícone para o VOD '{vod['title']}': {e}"
+                    )
             else:
                 # Opcional: Definir um ícone padrão se não houver miniatura
                 item.setIcon(QIcon("resources/icons/default_thumbnail.png"))

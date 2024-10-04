@@ -10,6 +10,7 @@ import os
 # Configuração do logger
 logger = setup_logger('VideoPlayerWidget')
 
+
 class VideoPlayerWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -29,13 +30,19 @@ class VideoPlayerWidget(QWidget):
                 logger.error("Sistema operacional não suportado para integração com VLC.")
         except Exception as e:
             logger.exception(f"Erro ao configurar o video output: {e}")
-        
+
         logger.debug("VideoPlayerWidget configurado com sucesso.")
 
         # Adicionar event manager para capturar eventos de VLC
         self.events = self.player.event_manager()
-        self.events.event_attach(vlc.EventType.MediaPlayerEncounteredError, self.handle_error)
-        self.events.event_attach(vlc.EventType.MediaPlayerEndReached, self.handle_end)
+        self.events.event_attach(
+            vlc.EventType.MediaPlayerEncounteredError,
+            self.handle_error
+        )
+        self.events.event_attach(
+            vlc.EventType.MediaPlayerEndReached,
+            self.handle_end
+        )
 
     def play(self, media_path):
         logger.info(f"Reproduzindo mídia: {media_path}")

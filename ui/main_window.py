@@ -1,17 +1,26 @@
 # ui/main_window.py
 
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLineEdit, QPushButton, QMessageBox, QHBoxLayout, QLabel
+from PyQt5.QtWidgets import (
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QLineEdit,
+    QPushButton,
+    QMessageBox,
+    QHBoxLayout,
+    QLabel,
+)
 from PyQt5 import QtCore
 from .video_player_widget import VideoPlayerWidget
 from .vod_list_widget import VODListWidget
 from utils.scraper import scrape_vods
 from utils.downloader import download_m3u8
 from utils.logger import setup_logger
-import sys
 import os
 
 # Configuração do logger
 logger = setup_logger('MainWindow')
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -59,7 +68,11 @@ class MainWindow(QMainWindow):
         logger.debug(f"Usuário iniciou a busca pelo streamer: '{streamer_name}'")
         if not streamer_name:
             logger.warning("Campo de busca vazio. Nenhuma ação tomada.")
-            QMessageBox.warning(self, "Aviso", "Por favor, digite o nome de um streamer.")
+            QMessageBox.warning(
+                self,
+                "Aviso",
+                "Por favor, digite o nome de um streamer.",
+            )
             return
 
         try:
@@ -70,10 +83,18 @@ class MainWindow(QMainWindow):
                 self.vod_list.populate_vods(vods)
             else:
                 logger.info(f"Nenhum VOD encontrado para o streamer '{streamer_name}'.")
-                QMessageBox.information(self, "Resultados da Busca", "Nenhum VOD encontrado para o streamer informado.")
+                QMessageBox.information(
+                    self,
+                    "Resultados da Busca",
+                    "Nenhum VOD encontrado para o streamer informado.",
+                )
         except Exception as e:
             logger.exception(f"Erro ao buscar VODs para o streamer '{streamer_name}'.")
-            QMessageBox.critical(self, "Erro", "Ocorreu um erro ao buscar os VODs. Verifique os logs para mais detalhes.")
+            QMessageBox.critical(
+                self,
+                "Erro",
+                "Ocorreu um erro ao buscar os VODs. Verifique os logs para mais detalhes.",
+            )
 
     def play_vod(self, item):
         vod_url = item.data(QtCore.Qt.UserRole)
@@ -89,4 +110,8 @@ class MainWindow(QMainWindow):
                 logger.info(f"Reprodução iniciada para o VOD: {m3u8_path}")
             except Exception as e:
                 logger.exception(f"Erro ao reproduzir o VOD com URL: {vod_url}")
-                QMessageBox.critical(self, "Erro", "Ocorreu um erro ao reproduzir o VOD. Verifique os logs para mais detalhes.")
+                QMessageBox.critical(
+                    self,
+                    "Erro",
+                    "Ocorreu um erro ao reproduzir o VOD. Verifique os logs para mais detalhes.",
+                )

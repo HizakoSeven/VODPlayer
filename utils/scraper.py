@@ -15,8 +15,11 @@ logger = setup_logger('Scraper')
 # Adiciona um FileHandler com codificação UTF-8 para suportar caracteres especiais
 file_handler = logging.FileHandler('scraper.log', encoding='utf-8')
 file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+file_handler.setFormatter(
+    logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+)
 logger.addHandler(file_handler)
+
 
 def scrape_vods_async(streamer_name, callback, retries=3):
     """
@@ -29,13 +32,16 @@ def scrape_vods_async(streamer_name, callback, retries=3):
     def run_scraper():
         logger.debug(f"Iniciando scraping assíncrono para o streamer '{streamer_name}'.")
         result = scrape_vods(streamer_name, retries)
-        logger.debug(f"Scraping assíncrono concluído para o streamer '{streamer_name}'. Chamando callback.")
+        logger.debug(
+            f"Scraping assíncrono concluído para o streamer '{streamer_name}'. Chamando callback."
+        )
         callback(result)
-    
+
     # Cria um thread daemon para executar o scraping em segundo plano
     thread = threading.Thread(target=run_scraper, daemon=True)
     logger.debug("Iniciando thread para scraping assíncrono.")
     thread.start()
+
 
 def scrape_vods(streamer_name, retries=3):
     """
@@ -46,11 +52,15 @@ def scrape_vods(streamer_name, retries=3):
     :return: Lista de dicionários com informações dos VODs.
     """
     for attempt in range(1, retries + 1):
-        logger.info(f"Tentativa {attempt} de {retries} para scraping do streamer '{streamer_name}'.")
+        logger.info(
+            f"Tentativa {attempt} de {retries} para scraping do streamer '{streamer_name}'."
+        )
         try:
             # Tenta realizar o scraping
             result = realizar_scraping(streamer_name)
-            logger.debug(f"Scraping realizado com sucesso para o streamer '{streamer_name}' na tentativa {attempt}.")
+            logger.debug(
+                f"Scraping realizado com sucesso para o streamer '{streamer_name}' na tentativa {attempt}."
+            )
             return result
         except Exception as e:
             # Captura qualquer exceção e faz uma nova tentativa após um tempo de espera
@@ -60,8 +70,11 @@ def scrape_vods(streamer_name, retries=3):
             time.sleep(sleep_time)  # Aguarda antes de tentar novamente
 
     # Se todas as tentativas falharem, registra um erro
-    logger.error(f"Falha ao realizar scraping para o streamer '{streamer_name}' após {retries} tentativas.")
+    logger.error(
+        f"Falha ao realizar scraping para o streamer '{streamer_name}' após {retries} tentativas."
+    )
     return []
+
 
 def realizar_scraping(streamer_name):
     """
@@ -90,7 +103,9 @@ def realizar_scraping(streamer_name):
             logger.debug("Obtido HTML da página de pesquisa.")
         except PlaywrightTimeoutError:
             # Trata o caso de tempo limite ao esperar pelos elementos
-            logger.warning("Tempo limite atingido ao aguardar os elementos de canal na página de pesquisa.")
+            logger.warning(
+                "Tempo limite atingido ao aguardar os elementos de canal na página de pesquisa."
+            )
             return []
         except Exception as e:
             # Captura qualquer outra exceção durante a navegação
@@ -105,7 +120,10 @@ def realizar_scraping(streamer_name):
     try:
         logger.debug("Iniciando extração do link do canal.")
         search_soup = BeautifulSoup(search_page_html, 'html.parser')  # Analisa o HTML da página de pesquisa
-        channel_link_tag = search_soup.find('a', href=lambda href: href and "/channels/@" in href)
+        channel_link_tag = search_soup.find(
+            'a',
+            href=lambda href: href and "/channels/@" in href
+        )
         if not channel_link_tag:
             # Se nenhum canal for encontrado, registra um aviso
             logger.warning(f"Nenhum canal encontrado para o streamer '{streamer_name}'.")
@@ -114,7 +132,9 @@ def realizar_scraping(streamer_name):
         logger.info(f"Encontrado canal: {channel_url}")
     except Exception as e:
         # Captura qualquer exceção durante a extração do link do canal
-        logger.exception(f"Erro ao extrair o link do canal na página de pesquisa: {e}")
+        logger.exception(
+            f"Erro ao extrair o link do canal na página de pesquisa: {e}"
+        )
         return []
 
     # Passo 3: Acessar a página do canal e extrair os VODs
@@ -136,7 +156,9 @@ def realizar_scraping(streamer_name):
             logger.debug("Obtido HTML da página do canal.")
         except PlaywrightTimeoutError:
             # Trata o caso de tempo limite ao esperar pelos VODs
-            logger.warning("Tempo limite atingido ao aguardar os elementos de VOD na página do canal.")
+            logger.warning(
+                "Tempo limite atingido ao aguardar os elementos de VOD na página do canal."
+            )
             return []
         except Exception as e:
             # Captura qualquer outra exceção durante a navegação
@@ -154,7 +176,10 @@ def realizar_scraping(streamer_name):
         vods = {}  # Dicionário para armazenar VODs únicos
 
         # Encontrar todos os links que correspondem ao padrão .m3u8
-        m3u8_links = channel_soup.find_all('a', href=re.compile(r'https://api\.vodvod\.top/m3u8/\d+/\d+/index\.m3u8'))
+        m3u8_links = channel_soup.find_all(
+            'a',
+            href=re.compile(r'https://api\.vodvod\.top/m3u8/\d+/\d+/index\.m3u8')
+        )
         logger.debug(f"Encontrados {len(m3u8_links)} links de VOD.")
 
         for link in m3u8_links:
