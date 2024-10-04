@@ -9,7 +9,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Usar uma versão específica para garantir consistência
+
+    strategy:
+      matrix:
+        python-version: [3.10, 3.11, 3.12]  # Removidas versões antigas
 
     steps:
       - name: Checkout do código
@@ -20,35 +24,33 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Verificar Versão do Python
-        run: python --version
-
-      - name: Cache de pip
+      - name: Cache do ambiente virtual
         uses: actions/cache@v3
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-ci-${{ matrix.python-version }}
+          path: .venv
+          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt') }}-ci-${{ matrix.python-version }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
-
-      - name: Atualizar pip
-        run: python -m pip install --upgrade pip
+            ${{ runner.os }}-venv-
+            ${{ runner.os }}-venv-${{ matrix.python-version }}-
 
       - name: Instalar dependências
         run: |
+          python -m venv .venv
+          source .venv/bin/activate || .venv\Scripts\activate
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
-          playwright install
 
       - name: Executar testes
         run: |
+          source .venv/bin/activate || .venv\Scripts\activate
           pytest
 
       - name: Verificar formatação com Black
         run: |
-          pip install black
+          source .venv/bin/activate || .venv\Scripts\activate
           black --check .
 
       - name: Verificar tipos com mypy
         run: |
-          pip install mypy
-          mypy .
+          source .venv/bin/activate || .venv\Scripts\activate
+          mypy . --install-types --strict
