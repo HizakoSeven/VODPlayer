@@ -50,4 +50,4 @@ jobs:
 
       - name: Run lint
         run: |
-          flake8 --exclude=__pycache__,venv .
+          flake8 --exclude=__pycache__,venv,.github .
