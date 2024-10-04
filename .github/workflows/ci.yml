@@ -1,56 +1,53 @@
-name: CI for VODPlayer
+name: CI Workflow
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
-  workflow_dispatch:  # Permite execução manual
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # Usar uma versão específica para garantir consistência
-
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.10, 3.11, 3.9]  # Corrigida versão 3.1 para 3.9
-
+        python-version: [3.8, 3.9, 3.11]
     steps:
-      - name: Checkout do código
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Configurar Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Cache do ambiente virtual
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt') }}-ci-${{ matrix.python-version }}
-          restore-keys: |
-            ${{ runner.os }}-venv-
-            ${{ runner.os }}-venv-${{ matrix.python-version }}-
-
-      - name: Instalar dependências
+      - name: Install dependencies
         run: |
-          python -m venv .venv
-          source .venv/bin/activate || .venv\Scripts\activate
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Executar testes
+      - name: Run tests
         run: |
-          source .venv/bin/activate || .venv\Scripts\activate
-          pytest
+          pytest tests/
 
-      - name: Verificar formatação com Black
-        run: |
-          source .venv/bin/activate || .venv\Scripts\activate
-          black --check .
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Verificar tipos com mypy
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
         run: |
-          source .venv/bin/activate || .venv\Scripts\activate
-          mypy . --install-types --strict
+          python -m pip install --upgrade pip
+          pip install flake8
+
+      - name: Run lint
+        run: |
+          flake8 .
