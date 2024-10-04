@@ -1,6 +1,6 @@
 Estrutura do projeto:
 
-VODplayer
+VODplayer/
 ├── data/
 │   ├── cache/
 │       ├── m3u8_files/
