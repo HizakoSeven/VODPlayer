@@ -8,6 +8,7 @@ from utils.logger import setup_logger
 from logging.handlers import RotatingFileHandler
 import logging
 import os
+import random
 
 
 # Configuração do logger com nível de log obtido da variável de ambiente
@@ -94,6 +95,7 @@ def main():
         print(f"Erro inesperado durante a execução da aplicação: {e}")  # Debug print
         sys.exit(1)  # Sai do programa com código de erro
 
+import pytest
 
 if __name__ == '__main__':
     # Ponto de entrada do script
