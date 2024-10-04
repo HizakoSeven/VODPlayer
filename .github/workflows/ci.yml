@@ -24,6 +24,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Cache de pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Atualizar pip
         run: python -m pip install --upgrade pip
 
@@ -46,3 +54,5 @@ jobs:
         run: |
           pip install mypy
           mypy .
+
+      # Opcional: Adicionar etapas para linting, segurança, etc.
