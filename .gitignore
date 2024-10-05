@@ -8,8 +8,8 @@ test.env
 pythonDOC
 
 # Ignorar logs
-data/logs/
-data/cache
+logs/
+data/cache/
 
 # Ignorar caches e arquivos compilados
 __pycache__/

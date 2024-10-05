@@ -134,7 +134,6 @@ class MainWindow(QMainWindow):
         Método sobrescrito para gerenciar o encerramento da aplicação.
         """
         logger.info("MainWindow está fechando. Iniciando processo de limpeza.")
-        print("MainWindow está fechando. Iniciando processo de limpeza.")
 
         # Parar a reprodução do VOD
         self.video_player.stop()

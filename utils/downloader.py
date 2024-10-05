@@ -27,6 +27,11 @@ async def download_m3u8(vod_link, cache_dir):
                 )
 
                 filename = os.path.basename(vod_link)
+                if not filename:
+                    logger.warning(
+                        f"Não foi possível determinar o nome do arquivo a partir da URL: {vod_link}"
+                    )
+                    filename = f"download_{int(asyncio.get_event_loop().time())}.m3u8"
                 filepath = os.path.join(cache_dir, filename)
                 os.makedirs(cache_dir, exist_ok=True)
 
@@ -43,5 +48,5 @@ async def download_m3u8(vod_link, cache_dir):
         logger.exception(f"Erro ao baixar o arquivo .m3u8 de '{vod_link}': {e}")
         raise
     except Exception as e:
-        logger.exception(f"Erro ao salvar o arquivo .m3u8 em '{filepath}': {e}")
+        logger.exception(f"Erro ao salvar o arquivo .m3u8 de '{vod_link}': {e}")
         raise

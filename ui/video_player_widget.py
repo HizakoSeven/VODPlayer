@@ -22,9 +22,9 @@ class VideoPlayerWidget(QWidget):
         # Integrar o player com o widget
         try:
             if sys.platform.startswith("linux"):  # para Linux usando X Server
-                self.player.set_xwindow(self.winId())
+                self.player.set_xwindow(int(self.winId()))
             elif sys.platform == "win32":  # para Windows
-                self.player.set_hwnd(self.winId())
+                self.player.set_hwnd(int(self.winId()))
             elif sys.platform == "darwin":  # para MacOS
                 self.player.set_nsobject(int(self.winId()))
             else:

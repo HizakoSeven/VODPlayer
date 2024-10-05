@@ -151,9 +151,10 @@ class Scraper:
             vods = {}  # Dicionário para armazenar VODs únicos
 
             # Encontrar todos os links que correspondem ao padrão .m3u8
+            # Tornar a regex mais flexível para capturar diferentes formatos de URLs
             m3u8_links = channel_soup.find_all(
                 "a",
-                href=re.compile(r"https://api\.vodvod\.top/m3u8/\d+/\d+/index\.m3u8"),
+                href=re.compile(r"https?://[^/]+/m3u8/.+/index\.m3u8"),
             )
             logger.debug(f"Encontrados {len(m3u8_links)} links de VOD.")
 
@@ -162,12 +163,19 @@ class Scraper:
                 title = (
                     link.get_text(strip=True) or "Sem Título"
                 )  # Extrai o título do VOD ou define como 'Sem Título'
+
+                # Tentativa de extrair a URL da miniatura, se disponível
+                thumbnail_tag = link.find_previous("img")
+                thumbnail_url = thumbnail_tag["src"] if thumbnail_tag else None
+
                 vods[href] = {
                     "title": title,
                     "link": href,
-                    "thumbnail": None,  # Atualize se as miniaturas puderem ser extraídas
+                    "thumbnail": thumbnail_url,  # Adiciona a miniatura
                 }
-                logger.debug(f"Adicionado VOD: {title}, URL: {href}")
+                logger.debug(
+                    f"Adicionado VOD: {title}, URL: {href}, Thumbnail: {thumbnail_url}"
+                )
 
             vod_list = list(vods.values())  # Converte o dicionário de VODs em uma lista
             logger.info(f"Encontrados {len(vod_list)} VODs na página do canal.")
