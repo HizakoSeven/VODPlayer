@@ -134,10 +134,23 @@ class MainWindow(QMainWindow):
         Método sobrescrito para gerenciar o encerramento da aplicação.
         """
         logger.info("MainWindow está fechando. Iniciando processo de limpeza.")
-        print("MainWindow está fechando. Iniciando processo de limpeza.")
 
         # Parar a reprodução do VOD
         self.video_player.stop()
 
+        # Iniciar a limpeza assíncrona
+        asyncio.create_task(self.cleanup())
+
         # Aceitar o evento para continuar o fechamento
         event.accept()
+
+    async def cleanup(self):
+        """
+        Realiza a limpeza assíncrona necessária antes de encerrar a aplicação.
+        """
+        logger.info("Iniciando tarefas de limpeza.")
+        try:
+            await self.scraper.close()
+            logger.info("Tarefas de limpeza concluídas.")
+        except Exception as e:
+            logger.exception("Erro durante as tarefas de limpeza.")
